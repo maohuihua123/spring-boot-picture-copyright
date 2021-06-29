@@ -1,0 +1,46 @@
+server:
+  port: 8080
+# 自定义图片存储目录
+web:
+  upload-path: D:/image/
+# 开启swagger
+swagger:
+  enable: true
+# spring相关配置
+spring:
+  profiles:
+    active: demo
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 10MB
+      max-request-size: 50MB
+  freemarker:
+    cache: false    # 页面不加载缓存，修改即时生效
+  jackson:
+    default-property-inclusion: ALWAYS
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+  # 模板引擎配置
+  thymeleaf:
+    cache: false # 开发时关闭缓存,不然没法看到实时页面
+    prefix: classpath:/templates/
+    suffix: .html
+    encoding: UTF-8
+    mode: HTML
+    servlet:
+      content-type: text/html
+  # 配置静态资源
+  mvc:
+    static-path-pattern: /**
+  resources:
+    static-locations: classpath:/META-INF/resources/,classpath:/resources/,classpath:/static/,classpath:/public/,file:${web.upload-path}
+# 区块链配置
+web3j:
+  url: http://127.0.0.1:7545
+  credentials:
+    privatekey: d79a156f560d5847892d1883bc6ea3e2cc77a8c8260f5285898eb1f5b037a98f
+  contract:
+    address: cc52b37e1fe04c4d5b28e0973fb6051cd98ef2ad
+
+

@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+	<head>
+		<meta charset="utf-8">
+		<title>所有版权</title>
+		<link rel="stylesheet" th:href="@{/component/pear/css/pear.css}" />
+	</head>
+	<body class="pear-container">
+		<div class="layui-card">
+			<div class="layui-card-body">
+				<form class="layui-form" action="">
+					<div class="layui-form-item">
+						<div class="layui-form-item layui-inline">
+							<label class="layui-form-label">版权号</label>
+							<div class="layui-input-inline">
+								<input type="text" name="copyrightID" placeholder="" class="layui-input"  lay-verify="number">
+							</div>
+						</div>
+						<div class="layui-form-item layui-inline">
+							<button class="pear-btn pear-btn-md pear-btn-primary" lay-submit lay-filter="user-query">
+								<i class="layui-icon layui-icon-search"></i>
+								查询
+							</button>
+							<button type="reset" class="pear-btn pear-btn-md">
+								<i class="layui-icon layui-icon-refresh"></i>
+								重置
+							</button>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+		<div class="layui-card">
+			<div class="layui-card-body">
+				<table id="user-table" lay-filter="user-table"></table>
+			</div>
+		</div>
+
+		<script type="text/html" id="user-toolbar">
+			<button class="pear-btn pear-btn-primary pear-btn-md" lay-event="add">
+		        <i class="layui-icon layui-icon-add-1"></i>
+		        新增
+		    </button>
+		</script>
+
+		<script type="text/html" id="user-bar">
+			<button class="pear-btn pear-btn-primary pear-btn-sm" lay-event="detail">查看</button>
+		</script>
+
+		<script type="text/html" id="user-createTime">
+			{{layui.util.toDateString(d.createTime, 'yyyy-MM-dd HH:mm:ss')}}
+		</script>
+
+		<script th:src="@{/component/layui/layui.js}"></script>
+		<script th:src="@{/component/pear/pear.js}"></script>
+		<script>
+			layui.use(['table', 'form', 'jquery','common'], function() {
+				let table = layui.table;
+				let form = layui.form;
+				let $ = layui.jquery;
+				let common = layui.common;
+
+				let MODULE_PATH = "operate/";
+
+				let cols = [
+					[{
+							title: '版权号',
+							field: 'pictureID',
+							align: 'center',
+							width: 70
+						},
+						{
+							title: '图片哈希',
+							field: 'pictureHash',
+							align: 'center'
+						},
+						{
+							title: '水印信息',
+							field: 'waterMark',
+							align: 'center'
+						},
+						{
+							title: '图片所有者账号',
+							field: 'ethAddress',
+							align: 'center',
+							width: 400
+						},
+						{
+							title: '创建时间',
+							field: 'createTime',
+							align: 'center',
+							templet: '#user-createTime'
+						},
+						{
+							title: '操作',
+							toolbar: '#user-bar',
+							align: 'center',
+							width: 130
+						}
+					]
+				]
+
+				table.render({
+					elem: '#user-table',
+					url: '/home/getCopyrights',
+					page: true,
+					cols: cols,
+					skin: 'line',
+					toolbar: '#user-toolbar',
+					defaultToolbar: [{
+						title: '刷新',
+						layEvent: 'refresh',
+						icon: 'layui-icon-refresh',
+					}, 'filter', 'print', 'exports']
+				});
+
+				table.on('tool(user-table)', function(obj) {
+					 if (obj.event === 'detail') {
+						window.detail(obj);
+					}
+				});
+
+				table.on('toolbar(user-table)', function(obj) {
+					if (obj.event === 'add') {
+						window.add();
+					} else if (obj.event === 'refresh') {
+						window.refresh();
+					}
+				});
+
+				form.on('submit(user-query)', function(data) {
+					let param = JSON.stringify(data.field);
+					table.reload('user-table', {
+						page: {
+							curr: 1
+						},
+						method: 'post',
+						url: '/home/queryCopyrights',
+						where: {
+							params: param
+						},
+					},'data')
+					return false;
+				});
+
+				window.add = function() {
+					layer.open({
+						type: 2,
+						title: '新增',
+						shade: 0.1,
+						area: [common.isModile()?'100%':'500px', common.isModile()?'100%':'400px'],
+						content: MODULE_PATH + 'add.html'
+					});
+				}
+
+				window.detail = function(obj) {
+					let data = JSON.stringify(obj.data);
+					data = encodeURIComponent(data);
+					layer.open({
+						type: 2,
+						title: '详细',
+						shade: 0.1,
+						area: ['600px', '500px'],
+						content: MODULE_PATH + 'detail.html?data='+data
+					});
+				}
+
+				window.refresh = function(param) {
+					table.reload('user-table');
+				}
+			})
+		</script>
+	</body>
+</html>
