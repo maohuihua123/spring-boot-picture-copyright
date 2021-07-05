@@ -26,7 +26,7 @@
 
 ## 快速部署
 
-1. clone 项目到本地 `git@github.com:mhh/demo.git`
+1. clone 项目到本地 `git@github.com:maohuihua123/spring-boot-picture-copyright.git`
 
 2. 搭建以太坊私链
 
