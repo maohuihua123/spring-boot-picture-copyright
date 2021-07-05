@@ -106,7 +106,7 @@
                 <artifactId>web3j-maven-plugin</artifactId>
                 <version>4.6.5</version>
                 <configuration>
-                    <packageName>com.mao.demo.contract</packageName>
+                    <packageName>com.mao.demo.dao</packageName>
                     <sourceDestination>src/main/java</sourceDestination>
                     <nativeJavaType>true</nativeJavaType>
                     <outputFormat>java</outputFormat>

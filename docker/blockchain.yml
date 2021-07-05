@@ -1,0 +1,22 @@
+version: '2'
+services:
+    ganache-cli:
+        image: trufflesuite/ganache-cli
+        container_name: ganache-cli
+        volumes:
+            - ./ganache_data:/ganache_data
+        ports:
+            - 8545:8545
+        command:
+            [
+                '--gasLimit',
+                '0xfffffffffff',
+            ]
+                    
+
+
+
+
+
+
+                    

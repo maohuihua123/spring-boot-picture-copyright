@@ -2,6 +2,7 @@ package com.mao.demo.controller;
 
 import com.mao.demo.common.annotation.NotResponseBody;
 import com.mao.demo.common.utils.*;
+import com.mao.demo.common.vo.ResultVO;
 import com.mao.demo.entity.Copyright;
 import com.mao.demo.entity.User;
 import com.mao.demo.service.UserService;
@@ -19,15 +20,18 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.awt.*;
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
-import java.util.*;
+import java.util.UUID;
 
 /**
  * @author mhh
@@ -45,12 +49,12 @@ public class UserController {
 
     private UserService userService;
 
+    private HttpServletRequest request;
+
     @Autowired
     public void setUserService(UserService userService) {
         this.userService = userService;
     }
-
-    private HttpServletRequest request;
 
     @Autowired
     public void setRequest(HttpServletRequest request) {
@@ -79,7 +83,7 @@ public class UserController {
 
             HttpHeaders headers = new HttpHeaders();
             headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
-            headers.add("Content-Disposition", String.format("attachment; filename=\"%s\"", fileName));
+            headers.add("Content-Disposition", "attachment;"+ URLEncoder.encode(fileName, "UTF-8"));
             headers.add("Pragma", "no-cache");
             headers.add("Expires", "0");
 
@@ -98,12 +102,15 @@ public class UserController {
     @ApiOperation("查询用户信息")
     @PostMapping("/getUserInfo")
     @NotResponseBody
-    public Map<String,Object> getUserInfo(@RequestParam("file") MultipartFile file, @RequestParam("password") String password) {
+    public  ResultVO<User> getUserInfo(@RequestParam("file") MultipartFile file, @RequestParam("password") String password) {
         log.info("<==== 查询用户信息 ===>");
         try {
             // 1.获取凭证
             String keystore = new String(file.getBytes());
             String privatekey = WalletUtils.decryptWallet(keystore, password);
+            if (privatekey == null){
+                return new ResultVO<>(500, "error",null);
+            }
             // 2.执行操作
             User user = userService.getUserInfo(privatekey);
             // 3.注册sessionid
@@ -111,16 +118,13 @@ public class UserController {
             request.getSession().setMaxInactiveInterval(120*60);
             // 私钥存入该用户的session 中
             request.getSession().setAttribute("privatekey", privatekey);
+            request.getSession().setAttribute("user", user);
 
-            Map<String,Object> result = new HashMap<>();
-            result.put("code",1000);
-            result.put("msg","success");
-            result.put("data",user);
             log.info("<==== 查询用户信息[成功] ===>");
-            return result;
+            return new ResultVO<>(200, "success",user);
         } catch (Exception e) {
-            log.error("操作异常", e);
-            return null;
+            log.info("账号或者密码不正确");
+            return new ResultVO<>(500, "error",null);
         }
     }
 
@@ -144,16 +148,13 @@ public class UserController {
     @ApiOperation("添加版权信息")
     @PostMapping("/addCopyright")
     @ResponseBody
-    public void addWaterMark(@RequestParam("image")MultipartFile image, boolean isText, String watermark, HttpServletResponse response)  {
+    public ResultVO<String> addWaterMark(@RequestParam("file")MultipartFile image, boolean isText, String watermark)  {
         log.info("<==== 添加版权信息 ===>");
         try {
             // 检查上传的图片，如果不符合要求 则终止
-            if (checkImage(image, isText)) return;
-
+            if (checkImage(image, isText)) return new ResultVO<>(500, "error",null);
             // 1、创建存储水印文件的存储目录
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd/");
-            String format = sdf.format(new Date());
-            File folder = new File(uploadPath + format);
+            File folder = new File(uploadPath);
             if (!folder.exists()) {
                 boolean mkdirs = folder.mkdirs();
             }
@@ -187,12 +188,10 @@ public class UserController {
             // 水印信息
             copyright.setWaterMark(watermark);
             // 加水印后图片路径（可扩展为IPFS，暂时为临时文件）
-            copyright.setPicturePath(outputPath);
+            copyright.setPicturePath(outputFileName);
             // 上链操作
             String result = userService.addCopyright(copyright, privatekey);
 
-            // 返回处理后的文件
-            download(response, outputPath);
             // 5.删除临时文件
             boolean isDelete1 = tempInputFile.delete();
             boolean isDelete2 = tempOutputQRFile.delete();
@@ -201,8 +200,10 @@ public class UserController {
             }
             log.info(result);
             log.info("<==== 添加版权信息[成功] ===>");
+            return new ResultVO<>(200, "success",outputFileName);
         } catch (Exception e) {
             e.printStackTrace();
+            return new ResultVO<>(500, "error",null);
         }
     }
 
@@ -259,31 +260,5 @@ public class UserController {
             // (二维码水印 && 图片尺寸 >= 800 * 800 返回true)
             return (picture.getWidth(null) < 800) || (picture.getHeight(null) < 800);
         }
-    }
-
-    private void download(HttpServletResponse response, String filePath) throws Exception{
-        File file = new File(filePath);
-        // 1、设置response 响应头
-        // 设置页面不缓存,清空buffer
-        response.reset();
-        // 字符编码
-        response.setCharacterEncoding("UTF-8");
-        // 二进制传输数据
-        response.setContentType("multipart/form-data");
-        // 设置响应头
-        response.setHeader("Content-Disposition", "attachment;fileName="+ URLEncoder.encode(file.getName(), "UTF-8"));
-        // 2、 读取文件--输入流
-        InputStream input = new FileInputStream(file);
-        // 3、 写出文件--输出流
-        OutputStream out = response.getOutputStream();
-        byte[] buff = new byte[1024];
-        int length;
-        // 4、执行写出操作
-        while((length= input.read(buff))!= -1){
-            out.write(buff, 0, length);
-            out.flush();
-        }
-        out.close();
-        input.close();
     }
 }

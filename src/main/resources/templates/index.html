@@ -25,16 +25,13 @@
 				<div id="control" class="layui-layout-control"></div>
 				<ul class="layui-nav layui-layout-right">
 					<li class="layui-nav-item layui-hide-xs"><a href="#" class="fullScreen layui-icon layui-icon-screen-full"></a></li>
-					<li class="layui-nav-item layui-hide-xs"><a href="http://www.pearadmin.com" class="layui-icon layui-icon-website"></a></li>
-					<li class="layui-nav-item layui-hide-xs message"></li>
 					<li class="layui-nav-item user">
 						<!-- 头 像 -->
 						<a href="javascript:;">
-							<img th:src="@{/admin/images/avatar.jpg}" class="layui-nav-img" alt="图片加载失败">
+							[[${nikeName}]]
 						</a>
 						<!-- 功 能 菜 单 -->
 						<dl class="layui-nav-child">
-							<dd><a user-menu-url="view/system/person.html" user-menu-id="5555" user-menu-title="基本资料">基本资料</a></dd>
 							<dd><a href="javascript:void(0);" class="logout">注销登录</a></dd>
 						</dl>
 					</li>
@@ -84,7 +81,7 @@
 				var popup = layui.popup;
 		
 				// 初始化顶部用户信息
-				admin.setAvatar("admin/images/avatar.jpg","就眠仪式");
+				admin.setAvatar("admin/images/avatar.jpg","登录");
 				
 				// 根目录下 pear.config.yml 文件为初始化配置
 				// 你可以通过 admin.setConfigPath 方法修改配置文件位置

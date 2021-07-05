@@ -3,44 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
-    <link rel="stylesheet" href="../../../component/pear/css/pear.css" />
+    <link rel="stylesheet" th:href="@{/component/pear/css/pear.css}" />
 </head>
 <body>
-<form class="layui-form" action="">
+<form class="layui-form" id="addForm" action="javascript:void(0);">
     <div class="mainBox">
         <div class="main-container">
             <div class="main-container">
                 <div class="layui-form-item">
-                    <label class="layui-form-label">账号</label>
+                    <label class="layui-form-label">水印信息</label>
                     <div class="layui-input-block">
-                        <input type="text" name="username" lay-verify="title" autocomplete="off" placeholder="请输入标题" class="layui-input">
+                        <input type="text" name="watermark" lay-verify="title" autocomplete="off" placeholder="请输入标题" class="layui-input">
                     </div>
                 </div>
                 <div class="layui-form-item">
-                    <label class="layui-form-label">姓名</label>
+                    <label class="layui-form-label">水印类别</label>
                     <div class="layui-input-block">
-                        <input type="text"  name="realName" lay-verify="title" autocomplete="off" placeholder="请输入标题" class="layui-input">
+                        <input type="radio" name="isText" value="true" title="文本" checked>
+                        <input type="radio" name="isText" value="false" title="二维码">
                     </div>
                 </div>
                 <div class="layui-form-item">
-                    <label class="layui-form-label">邮箱</label>
+                    <label class="layui-form-label">选择图片</label>
                     <div class="layui-input-block">
-                        <input type="text"  name="email" lay-verify="title" autocomplete="off" placeholder="请输入标题" class="layui-input">
+                        <input placeholder="请选择图片" name="image" id="image" lay-verify="required" hover class="layui-input"  />
                     </div>
                 </div>
-                <div class="layui-form-item">
-                    <label class="layui-form-label">密码</label>
-                    <div class="layui-input-block">
-                        <input type="text"  name="password" lay-verify="title" autocomplete="off" placeholder="请输入标题" class="layui-input">
-                    </div>
+                <hr>
+                <div class="container">
+                    <p class="text-info">注意：</p>
+                    <p class="text-info">1、文本水印不支持中文</p>
+                    <p class="text-info">2、二维码水印要求图片尺寸大于800*800</p>
                 </div>
-                <div class="layui-form-item">
-                    <label class="layui-form-label">电话</label>
-                    <div class="layui-input-block">
-                        <input type="text"  name="phone" lay-verify="title" autocomplete="off" placeholder="请输入标题" class="layui-input">
-                    </div>
-                </div>
-
             </div>
         </div>
     </div>
@@ -57,31 +51,57 @@
         </div>
     </div>
 </form>
-<script src="../../../component/layui/layui.js"></script>
-<script src="../../../component/pear/pear.js"></script>
+<script th:src="@{/component/layui/layui.js}"></script>
+<script th:src="@{/component/pear/pear.js}"></script>
 <script>
-layui.use(['form','jquery'],function(){
+layui.use(['form','jquery','upload'],function(){
     let form = layui.form;
     let $ = layui.jquery;
+    let upload = layui.upload;
+
+    upload.render({
+        elem: '#image'
+        , url: '/user/addCopyright'
+        , auto: false // 不自动上传
+        , exts: 'jpg|png|jpeg'
+        , bindAction: '#user-save'
+        , choose: function (obj) {
+            // 预读本地文件
+            obj.preview(function (index, file, result) {
+                $("#image").val(file.name);
+            })
+        }
+        , done: function(res){
+            //上传完毕
+            if (res.code === 200){
+                return layer.msg('图片上传成功');
+            }else{
+                return layer.msg('图片上传失败');
+            }
+        }
+        , error: function (index, upload) {
+            layer.msg('上传失败！' + index, { icon: 5 });
+        }
+    });
 
     form.on('submit(user-save)', function(data){
-        let roleIds = "";
-        $('input[type=checkbox]:checked').each(function() {
-            roleIds += $(this).val()+",";
-        });
-        roleIds = roleIds.substr(0,roleIds.length-1);
-        data.field.roleIds = roleIds;
+        let formData = new FormData(document.getElementById("addForm"));
         $.ajax({
-            url:'/system/user/save',
-            data:JSON.stringify(data.field),
-            dataType:'json',
-            contentType:'application/json',
-            type:'post',
+            url: '/user/addCopyright',
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
             success:function(result){
-                if(result.success){
+                if (result.code === 200){
                     layer.msg(result.msg,{icon:1,time:1000},function(){
                         parent.layer.close(parent.layer.getFrameIndex(window.name));//关闭当前页
                         parent.layui.table.reload("user-table");
+                        let url = window.location.protocol+"//"+window.location.host+"//"+result.data;
+                        let a = document.createElement('a');
+                        a.href = url;
+                        a.download = result.data;
+                        a.click();
                     });
                 }else{
                     layer.msg(result.msg,{icon:2,time:1000});

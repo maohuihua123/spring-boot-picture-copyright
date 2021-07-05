@@ -3,7 +3,7 @@ package com.mao.demo.common.enums;
 import lombok.Getter;
 
 /**
- * @author RudeCrab
+ * @author mhh
  * @description 响应码枚举
  */
 @Getter

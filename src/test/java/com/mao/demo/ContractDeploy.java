@@ -1,6 +1,6 @@
 package com.mao.demo;
 
-import com.mao.demo.contract.PictureCopyright;
+import com.mao.demo.dao.PictureCopyright;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

@@ -7,7 +7,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 
 /**
- * @author RudeCrab
+ * @author mhh
  * @description 自定义统一响应体
  */
 @Getter
@@ -19,23 +19,19 @@ public class ResultVO<T> {
     private String msg;
     @ApiModelProperty(value = "响应的具体数据")
     private T data;
-
     public ResultVO(T data) {
         this(ResultCode.SUCCESS, data);
     }
-
     public ResultVO(ResultCode resultCode, T data) {
         this.code = resultCode.getCode();
         this.msg = resultCode.getMsg();
         this.data = data;
     }
-
     public ResultVO(ExceptionCode annotation, T data) {
         this.code = annotation.value();
         this.msg = annotation.message();
         this.data = data;
     }
-
     public ResultVO(int code, String msg, T data) {
         this.code = code;
         this.msg = msg;

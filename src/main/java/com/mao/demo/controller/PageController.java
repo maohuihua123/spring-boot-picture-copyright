@@ -2,11 +2,15 @@ package com.mao.demo.controller;
 
 import com.alibaba.fastjson.JSONObject;
 import com.mao.demo.entity.Copyright;
+import com.mao.demo.entity.User;
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * @author mhh
@@ -16,13 +20,36 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Slf4j
 @Controller
 @Api(tags = "路由控制")
-@RequestMapping("/")
+@RequestMapping("")
 public class PageController {
 
+    private HttpServletRequest request;
+
+    @Autowired
+    public void setRequest(HttpServletRequest request) {
+        this.request = request;
+    }
+
     @RequestMapping("/index.html")
-    public String index(){
+    public String index(Model model){
         log.info("index.html");
+        User user = (User) request.getSession().getAttribute("user");
+        model.addAttribute("nikeName", user.getNickName());
         return "index";
+    }
+
+    @RequestMapping("/login.html")
+    public String login(){
+        log.info("login.html");
+        // 清除session
+        request.getSession().invalidate();
+        return "login";
+    }
+
+    @RequestMapping("/register.html")
+    public String register(){
+        log.info("register.html");
+        return "view/system/register";
     }
 
     @RequestMapping("/view/console/console1.html")
@@ -43,6 +70,7 @@ public class PageController {
         return "view/system/user";
     }
 
+
     @RequestMapping("/view/system/role.html")
     public String role(){
         log.info("role.html");
@@ -60,18 +88,7 @@ public class PageController {
         log.info("detail.html");
         JSONObject jsonData = (JSONObject) JSONObject.parse(data);
         Copyright copyright = jsonData.toJavaObject(Copyright.class);
-
-//        // 构造jsonArray
-//        JSONArray jsonArray = new JSONArray();
-//        Map<String,String> map = new HashMap<>();
-//        map.put("id","1");
-//        map.put("image","https://gw.alipayobjects.com/zos/rmsportal/gLaIAoVWTtLbBWZNYEMg.png");
-//        map.put("title","Alipay");
-//        map.put("remark","那是一种内在的东西， 他们到达不了，也无法触及的");
-//        map.put("time",copyright.getCreateTime());
-//        jsonArray.add(map);
-
-        model.addAttribute("data",copyright);
+        model.addAttribute("data",copyright.getPictureID());
         return "view/system/operate/detail";
     }
 
@@ -80,4 +97,5 @@ public class PageController {
         log.info("add.html");
         return "view/system/operate/add";
     }
+
 }

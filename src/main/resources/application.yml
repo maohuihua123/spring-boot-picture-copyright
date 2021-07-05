@@ -3,6 +3,7 @@ server:
 # 自定义图片存储目录
 web:
   upload-path: D:/image/
+  url: http://localhost:8080/
 # 开启swagger
 swagger:
   enable: true
@@ -37,10 +38,10 @@ spring:
     static-locations: classpath:/META-INF/resources/,classpath:/resources/,classpath:/static/,classpath:/public/,file:${web.upload-path}
 # 区块链配置
 web3j:
-  url: http://127.0.0.1:7545
+  url: http://127.0.0.1:8545
   credentials:
-    privatekey: d79a156f560d5847892d1883bc6ea3e2cc77a8c8260f5285898eb1f5b037a98f
+    privatekey: f90b1f01b0b6a5cf7473b4afa758c62b7e92b953a38e75c173e46203ae5831d5 # 注意，不要开头的0x
   contract:
-    address: cc52b37e1fe04c4d5b28e0973fb6051cd98ef2ad
+    address: 20c9da1bb616c1d850ae71c4d7f477df74926b39 # 注意，不要开头的0x
 
 

@@ -1,6 +1,6 @@
 package com.mao.demo.common.config;
 
-import com.mao.demo.contract.PictureCopyright;
+import com.mao.demo.dao.PictureCopyright;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

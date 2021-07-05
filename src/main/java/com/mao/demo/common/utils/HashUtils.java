@@ -5,9 +5,7 @@ import java.math.BigInteger;
 import java.security.MessageDigest;
 
 public class HashUtils {
-    public static void main(String[] args) {
-        System.out.println(strMD5HashCode("1123"));
-    }
+
     public static byte[] toBytes32(String str){
         byte[] strBytes = str.getBytes();
         byte[] bytes32 = new byte[32];
@@ -38,7 +36,7 @@ public class HashUtils {
             // 1代表绝对值
             BigInteger bigInt = new BigInteger(1, md5Bytes);
             // 转换为16进制
-            return bigInt.toString(16);
+            return bigInt.toString(16).toUpperCase();
         } catch (Exception e) {
             e.printStackTrace();
             return "null";

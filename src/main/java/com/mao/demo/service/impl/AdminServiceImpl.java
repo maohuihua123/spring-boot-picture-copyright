@@ -1,7 +1,7 @@
 package com.mao.demo.service.impl;
 
 import com.mao.demo.common.utils.WalletUtils;
-import com.mao.demo.contract.PictureCopyright;
+import com.mao.demo.dao.PictureCopyright;
 import com.mao.demo.entity.Copyright;
 import com.mao.demo.entity.User;
 import com.mao.demo.service.AdminService;

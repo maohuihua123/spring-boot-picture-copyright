@@ -1,4 +1,4 @@
-package com.mao.demo.contract;
+package com.mao.demo.dao;
 
 import io.reactivex.Flowable;
 import io.reactivex.functions.Function;

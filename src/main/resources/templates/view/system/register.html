@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en"  xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>注册页面</title>
+    <link rel="stylesheet" th:href="@{/component/pear/css/pear.css}" />
+    <link rel="stylesheet" th:href="@{admin/css/other/login.css}" />
+</head>
+<body background="admin/images/background.svg" style="background-size: cover;">
+<form class="layui-form" action="javascript:void(0);">
+    <div class="layui-form-item">
+        <img class="logo" th:src="@{admin/images/logo.png}" />
+        <div class="title">用户注册界面</div>
+        <div class="desc"></div>
+    </div>
+    <div class="layui-form-item">
+        <input placeholder="昵称 : 请输入用户昵称 " name="nickName" id="nickName" lay-verify="title" hover class="layui-input"  />
+    </div>
+    <div class="layui-form-item">
+        <input placeholder="邮箱 : 请输入邮箱号 " name="email" id="email" lay-verify="required|email" hover class="layui-input"  />
+    </div>
+    <div class="layui-form-item">
+        <input  type="password" placeholder="密 码 : 请输入账户密码 " name="password" id="password" lay-verify="pass" hover class="layui-input"  />
+    </div>
+    <div class="layui-form-item">
+        <a href="/login.html" >已有账号？前往登录</a>
+    </div>
+    <div class="layui-form-item">
+        <button type="button" class="pear-btn pear-btn-success register" lay-submit lay-filter="register">
+            注册
+        </button>
+    </div>
+</form>
+<script th:src="@{/component/layui/layui.js}"></script>
+<script th:src="@{/component/pear/pear.js}"></script>
+<script>
+    layui.use(['form','jquery','button'],function(){
+        let form = layui.form;
+        let $ = layui.jquery;
+        let button = layui.button;
+
+        // 自定义验证规则
+        form.verify({
+            title: function(value){
+                if(value.length < 2){
+                    return '昵称至少得5个字符';
+                }else if(value.length > 20){
+                    return '昵称不能多于20个字符';
+                }
+            }
+            ,pass: [
+            /^[\S]{6,16}$/
+            ,'密码必须6到16位，且不能出现空格'
+            ]
+        });
+        // 登 录 提 交
+        form.on('submit(register)', function(data) {
+            // 1、加载动画
+            button.load({
+                elem: '.register',
+                time: 3000
+            })
+            // 2、提交表单
+            let xmlhttp;
+            if (window.XMLHttpRequest) {
+                xmlhttp = new XMLHttpRequest();
+            } else {
+                xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+            }
+            xmlhttp.responseType = "blob";  // 返回类型blob
+            xmlhttp.open("POST","/user/addUser",true);
+            xmlhttp.setRequestHeader("Content-type", "application/json;charset=UTF-8");
+            xmlhttp.onload = function () {
+                if (xmlhttp.getResponseHeader("Content-type") === 'application/octet-stream') {
+                    // 获得文件名
+                    let dispositionArray = xmlhttp.getResponseHeader("Content-disposition").split(";");
+                    let filename = dispositionArray[dispositionArray.length - 1].replace("filename*=UTF-8''", '').replace(" ", '');
+                    filename = decodeURI(filename);
+                    // 开始下载
+                    let url = window.URL.createObjectURL(xmlhttp.response);
+                    let a = document.createElement("a");
+                    a.href = url;
+                    a.style.display = 'none'
+                    a.download = filename;
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    a.remove();
+                } else {
+                    let reader = new FileReader();
+                    reader.addEventListener('loadend', function (e) {
+                        let data = JSON.parse(e.target.result);
+                    });
+                    reader.readAsText(xmlhttp.response);
+                }
+            };
+            xmlhttp.onreadystatechange = function() {
+                // 判断readyState就绪状态是否为4，判断status响应状态码是否为200
+                if (xmlhttp.readyState===4 && xmlhttp.status===200) {
+                    layer.msg("注册成功",{icon:1,time:2000});
+                }
+            };
+            // 发送ajax请求
+            xmlhttp.send(JSON.stringify(data.field));
+
+            return false;
+        });
+
+    })
+</script>
+<script>
+</script>
+</body>
+</html>

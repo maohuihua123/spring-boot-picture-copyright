@@ -6,84 +6,27 @@
     <link rel="stylesheet" th:href="@{/component/pear/css/pear.css}" />
 </head>
 <body>
-<form class="layui-form" action="">
-    <div class="mainBox">
-        <div class="main-container">
-            <input type="hidden" id="data" th:value="${data}">
-            <div class="layui-form-item">
-                <label class="layui-form-label">邮箱</label>
-                <div class="layui-input-block">
-                    <input type="text"  name="email" th:value="${data.waterMark}" lay-verify="title" autocomplete="off" placeholder="请输入标题" class="layui-input">
-                </div>
-            </div>
-            <div class="layui-card">
-                <div class="layui-card-body">
-                    <table id="user-table" lay-filter="user-table"></table>
-                </div>
+<div class="mainBox">
+    <div class="main-container">
+        <input type="hidden" id="data" th:value="${data}">
+        <div class="layui-card">
+            <div class="layui-card-body">
+                <table id="user-table" lay-filter="user-table"></table>
             </div>
         </div>
     </div>
-    <div class="bottom">
-        <div class="button-container">
-            <button type="submit" class="pear-btn pear-btn-primary pear-btn-sm" lay-submit="" lay-filter="user-save">
-                <i class="layui-icon layui-icon-ok"></i>
-                提交
-            </button>
-            <button type="reset" class="pear-btn pear-btn-sm">
-                <i class="layui-icon layui-icon-refresh"></i>
-                重置
-            </button>
-        </div>
-    </div>
-</form>
+</div>
 <script th:src="@{/component/layui/layui.js}"></script>
 <script th:src="@{/component/pear/pear.js}"></script>
 <script>
-layui.use(['form','jquery','cardTable'],function(){
-    let form = layui.form;
-    let $ = layui.jquery;
+layui.use('cardTable', function(){
     let cardTable = layui.cardTable;
     const data = document.getElementById("data").value;
-    console.log(data)
     cardTable.render({
         elem: '#user-table',
         page: false, //是否分页
-        data: [{
-            "id": "1",
-            "image": "https://gw.alipayobjects.com/zos/rmsportal/gLaIAoVWTtLbBWZNYEMg.png",
-            "title": "Alipay",
-            "remark": "那是一种内在的东西， 他们到达不了，也无法触及的",
-            "time": "几秒前"
-        }],
+        url: "/home/copyrightDetail?copyrightID="+data,// 数据 url 连接
     })
-
-    form.on('submit(user-save)', function(data){
-        let roleIds = "";
-        $('input[type=checkbox]:checked').each(function() {
-            roleIds += $(this).val()+",";
-        });
-        roleIds = roleIds.substr(0,roleIds.length-1);
-        data.field.roleIds = roleIds;
-
-        $.ajax({
-            url:'/system/user/save',
-            data:JSON.stringify(data.field),
-            dataType:'json',
-            contentType:'application/json',
-            type:'post',
-            success:function(result){
-                if(result.success){
-                    layer.msg(result.msg,{icon:1,time:1000},function(){
-                        parent.layer.close(parent.layer.getFrameIndex(window.name));//关闭当前页
-                        parent.layui.table.reload("user-table");
-                    });
-                }else{
-                    layer.msg(result.msg,{icon:2,time:1000});
-                }
-            }
-        })
-        return false;
-    });
 })
 </script>
 <script>
