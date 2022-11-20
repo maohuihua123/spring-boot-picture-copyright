@@ -1,9 +1,8 @@
 ## 项目介绍
 
-图片版存证系统基于盲水印技术以及区块链技术，**目的是给图片添加盲水印，同时将原图的哈希值存储上链，达到图片版权存证的功能**，项目采用 SpringBoot 以及Pear-Admin-Layui开发，涉及到了智能合约Solidity、打包、以及如何在Java中调用以太坊，属于区块链开发的入门级Demo.
+图片版存证系统基于盲水印技术以及区块链技术，**目的是给图片添加盲水印，同时将原图的哈希值存储上链，达到图片版权存证的功能**，项目采用 SpringBoot 以及Pear-Admin-Layui开发，涉及到了智能合约Solidity、打包、web3j如何与以太坊交互，如创建钱包，转账，信息存储上链，查询链上信息，属于区块链开发的入门级Demo.
 
 * 项目地址：https://github.com/maohuihua123/spring-boot-picture-copyright
-* 项目预览：
 
 ## 项目技术
 
@@ -12,7 +11,7 @@
 * SpringBoot
 * Web3j
 * Solidity
-* OpenCV
+* OpenCV(加水印已移除，可以另起项目；只保留了更纯粹的以太坊操作，便于学习使用区块链技术)
 * Pear-Admin-Layui
 
 ## 项目效果图
