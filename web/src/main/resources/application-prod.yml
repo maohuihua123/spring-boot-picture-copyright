@@ -1,0 +1,11 @@
+# 区块链配置
+web3j:
+  url: http://127.0.0.1:7545
+  credentials:
+    # 区块链私钥.(注意, 不要开头的0x)
+    privatekey: 9826debde362016728605cb7f836b3bda6df74e82387545a502382bc18f30661
+  contract:
+    # 合约地址.(注意, 不要开头的0x)
+    address: 14fa785bcae2cfbd895fb796124bc398aa0c27b5
+
+

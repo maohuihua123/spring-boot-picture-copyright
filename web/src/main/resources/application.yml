@@ -1,0 +1,17 @@
+server:
+  port: 8080
+spring:
+  profiles:
+    active: dev
+  jackson:
+    default-property-inclusion: ALWAYS
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+swagger:
+  base-package: com.mao.demo.controller
+  title: 项目接口文档
+  description: SpringBoot-Ethereum-Project
+  version: 1.0.0
+  contract-name: mao
+  contract-url: https://baidu.com
+  contract-email: 1781521696@qq.com
